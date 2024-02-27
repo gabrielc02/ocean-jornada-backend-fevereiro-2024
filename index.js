@@ -1,39 +1,55 @@
-const express = require('express')
-const app = express()
+const express = require("express");
+const { MongoClient } = require("mongodb");
 
-app.get('/', function (req, res) {
-  res.send('Hello World')
-})
+//Connecting to mongoDB
+const dbUrl =
+  "mongodb+srv://admin:kmi7CDCACMybyduX@cluster0.h7crlbc.mongodb.net";
+const dbName = "OceanJornadaBackendFev2024";
 
-app.get('/oi', function (req, res) {
-  res.send('Ola Mundo')
-})
+async function main() {
+  const client = new MongoClient(dbUrl);
 
-const lista =['Rick Sanchez', 'Morty Smith', 'Summer Smith']
+  console.log("Conectando com o banco de dados...");
+  await client.connect();
+  console.log("Conectado com sucesso!!!");
 
-//Read all -> [GET] /item
-app.get('/item', function (req, res) {
-  res.send(lista)
-})
+  const app = express();
 
-//Read by ID
-app.get('/item/:id', function (req, res){
-  const id = req.params.id
-  const item = lista[id]
+  app.get("/", function (req, res) {
+    res.send("Hello World");
+  });
 
-  res.send(item)
-})
+  app.get("/oi", function (req, res) {
+    res.send("Ola Mundo");
+  });
 
-//Corpo da requisicao em jason
-app.use(express.json())
+  const lista = ["Rick Sanchez", "Morty Smith", "Summer Smith"];
 
-app.post('/item', function (req, res){
-  const body = req.body
-  const item = body.name
-  lista.push(item)
+  //Read all -> [GET] /item
+  app.get("/item", function (req, res) {
+    res.send(lista);
+  });
 
-  res.send("Item adicionado com sucesso!")
-})
+  //Read by ID
+  app.get("/item/:id", function (req, res) {
+    const id = req.params.id;
+    const item = lista[id];
 
+    res.send(item);
+  });
 
-app.listen(3000)
+  //Corpo da requisicao em jason
+  app.use(express.json());
+
+  app.post("/item", function (req, res) {
+    const body = req.body;
+    const item = body.name;
+    lista.push(item);
+
+    res.send("Item adicionado com sucesso!");
+  });
+
+  app.listen(3000);
+}
+
+main();
