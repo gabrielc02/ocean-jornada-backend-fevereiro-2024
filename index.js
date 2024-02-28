@@ -1,9 +1,8 @@
 const express = require("express");
-const { MongoClient } = require("mongodb");
+const { MongoClient, ObjectId } = require("mongodb");
 
 //Connecting to mongoDB
-const dbUrl =
-  "mongodb+srv://admin:kmi7CDCACMybyduX@cluster0.h7crlbc.mongodb.net";
+const dbUrl = "mongodb+srv://admin:kmi7CDCACMybyduX@cluster0.h7crlbc.mongodb.net";
 const dbName = "OceanJornadaBackendFev2024";
 
 async function main() {
@@ -25,15 +24,21 @@ async function main() {
 
   const lista = ["Rick Sanchez", "Morty Smith", "Summer Smith"];
 
+  const db = client.db(dbName)
+  const colletction = db.collection('itens')
+
   //Read all -> [GET] /item
-  app.get("/item", function (req, res) {
-    res.send(lista);
+  app.get("/item", async function (req, res) { 
+    const items = await colletction.find().toArray()
+    res.send(items);
   });
 
   //Read by ID
-  app.get("/item/:id", function (req, res) {
+  app.get("/item/:id", async function (req, res) {
     const id = req.params.id;
-    const item = lista[id];
+    const item = await colletction.findOne({
+      _id: new ObjectId(id)
+    });
 
     res.send(item);
   });
