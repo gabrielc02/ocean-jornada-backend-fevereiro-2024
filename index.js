@@ -1,5 +1,5 @@
 const express = require("express");
-const { MongoClient, ObjectId } = require("mongodb");
+const { MongoClient, ObjectId, Collection } = require("mongodb");
 
 //Connecting to mongoDB
 const dbUrl = "mongodb+srv://admin:kmi7CDCACMybyduX@cluster0.h7crlbc.mongodb.net";
@@ -46,13 +46,37 @@ async function main() {
   //Corpo da requisicao em jason
   app.use(express.json());
 
-  app.post("/item", function (req, res) {
-    const body = req.body;
-    const item = body.name;
-    lista.push(item);
+  //Add item
+  app.post("/item", async function (req, res) {
+    const item = req.body
+    await colletction.insertOne(item)
 
-    res.send("Item adicionado com sucesso!");
+    res.send(item);
   });
+
+  //Update -> [PUT]
+  app.put("/item/:id", async function(req, res){
+    const id = req.params.id //Get the id from the route /item/id
+    const novoItem = req.body //New item from the body of request
+
+    await colletction.updateOne( 
+      { _id: new ObjectId(id)},
+      { $set: novoItem }
+    )
+
+    res.send('Item atualizado com sucesso!!!')
+  })
+
+  //DELETE -> [DELETE]
+  app.delete("/item/:id", async function(req, res){
+    const id = req.params.id
+
+    await colletction.deleteOne({ _id: new ObjectId(id)})
+
+    res.send("item deletado com sucesso!!!")
+
+  })
+
 
   app.listen(3000);
 }
